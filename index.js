@@ -1,22 +1,18 @@
-require('babel-core/register')()
-require('babel-polyfill')
+const Constant = require('./servers/global.js')
 const Koa = require('Koa')
 const Router = require('koa-router')
+const bodyParser = require('koa-bodyparser')
 const routerIndex = require('./routers/index.js')
 const App = new Koa()
 
-// const user = new Router()
-//
-// users.get('/userDetail', async (ctx, next) => {
-//   ctx.body = 555
-// })
-//
-// user.use('/user', users.routes(), users.allowedMethods())
-//
-// app.use(user.routes())
+App.use(bodyParser({
+  enableTypes: ['json', 'form', 'text']
+}))
 
+// 开启路由设置
 new routerIndex().init(App, Router)
 
+// 监听3001端口
 App.listen(3001, () => {
   console.log('ok')
 })

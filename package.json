@@ -12,19 +12,21 @@
   "author": "hoverCow",
   "license": "ISC",
   "dependencies": {
-    "koa": "^2.5.0",
     "axios": "^0.17.1",
     "bcrypt": "^1.0.3",
     "cookie": "^0.3.1",
     "glob": "^7.1.2",
-    "koa-bodyparser": "^4.2.0",
+    "koa": "^2.5.0",
+    "koa-bodyparser": "^4.0.0",
     "koa-logger": "^3.1.0",
+    "koa-multer": "^1.0.2",
     "koa-router": "^7.3.0",
     "koa-session": "^5.5.1",
     "koa-static": "^4.0.2",
     "koa-views": "^6.1.2",
     "mongoose": "^4.13.4",
     "socket.io": "^2.0.4",
+    "uuid": "^3.1.0",
     "xss": "^0.3.4"
   },
   "devDependencies": {
