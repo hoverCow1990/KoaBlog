@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>T+1计算</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+</head>
+<body>
+<input id="input" type="text" name="" value="">
+<button id='btn'>fa</button>
+<br/>
+<a href="http://localhost:3000/download/2.jpg">http://localhost:3000/download/2.jpg</a>
+<br/>
+<a href="http://localhost:3000/download/momo/55.jpg">http://localhost:3000/download/momo/55.jpg</a>
+<form class="" action="http://localhost:3000/upload/hey" method="post" enctype="multipart/form-data">
+  <input id="fileId1" type="file" accept="image/png,image/gif" name="file" />
+  <input type="text" name="id" value="">
+  <input type="text" name="pass" value="">
+  <button type="submit" name="button">提交</button>
+</form>
+<br/>
+<input type="text" name="name" id="name"/>
+<input type="text" name="password" id="password">
+<button name="button" id="login">提交</button>
+<br/>
+<input type="text" name="name2" id="name2"/>
+<input type="text" name="password2" id="password2">
+<button name="button" id="regist">提交</button>
+<!-- <form class="" action="http://localhost:3000/login" method="post">
+  <input type="text" name="name" />
+  <input type="text" name="password">
+  <button type="submit">提交</button>
+</form> -->
+<script type="text/javascript">
+var btn = document.getElementById('btn')
+btn.onclick = function () {
+  $.ajax({
+    url: 'http://localhost:3000/user/regist',
+    method: 'post',
+    data: {
+      name: 'jaja',
+      age: 'popo'
+    },
+    success: function() {
+      console.log(222)
+    }
+  })
+}
+$('#login').on('click', () => {
+  $.ajax({
+    url: 'http://localhost:3000/login',
+    method: 'post',
+    data: {
+      name: $('#name').val(),
+      password: $('#password').val()
+    },
+    success: function(res) {
+      if(res.state) {
+        alert('登录成功')
+      } else {
+        alert(res.msg)
+      }
+    }
+  })
+})
+
+$('#regist').on('click', () => {
+  $.ajax({
+    url: 'http://localhost:3000/login/regist',
+    method: 'post',
+    data: {
+      name: $('#name2').val(),
+      password: $('#password2').val()
+    },
+    success: function(res) {
+
+    }
+  })
+})
+</script>
+</html>
