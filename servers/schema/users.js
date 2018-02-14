@@ -4,7 +4,7 @@ const ObjectId = Schema.Types.ObjectId
 
 let Users = new Schema({
     author: ObjectId,
-    id: String,
+    name: String,
     password: String,
     uuid: String,
     lv: Number,
@@ -13,6 +13,6 @@ let Users = new Schema({
     git: String,
     blog: String,
     introduce: String
-})
+  })
 
 module.exports = mongoose.model('Users', Users, 'users')
