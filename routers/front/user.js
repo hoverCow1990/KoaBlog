@@ -1,9 +1,10 @@
 const routerClass = require('../../servers/decorators/routers.js')
 const UserSchema = require('../../servers/schema/users.js')
+const $passWordUnit = require('../../lib/password.js')
 const multer = require('koa-multer')
 const uuidV1 = require('uuid/v1')
 const fs = require('fs')
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: 'static/uploads/' })
 
 /**
  * 前端用户路由
@@ -29,22 +30,22 @@ class User {
 
   async regist () {
     this.router.post('/regist', upload.single('file'), async (ctx, next) => {
-      const { id, password } = ctx.req.body
+      const { name, password } = ctx.req.body
       const { file } = ctx.req
       const filePath = file.path
 
       // 二次验证数据的有效性
-      if (!id || /^\d+$/.test(id) || id.length > 10 || !password || /[\u4e00-\u9fa5]/g.test(password) || password.length < 5 || password.length > 15) {
+      if (!name || /^\d+$/.test(name) || name.length > 10 || !password || /[\u4e00-\u9fa5]/g.test(password) || password.length < 5 || password.length > 15) {
         if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
-        ctx.throw(500, '非法请求')
+        ctx.error(500, '非法请求')
         return
       }
 
       // 查询是否已存在相同用户名
-      let userData = await UserSchema.find({id: id}, (err, docs) => {
+      let userData = await UserSchema.find({name: name}, (err, docs) => {
         if (err) {
           if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
-          ctx.throw(500, '查询用户名表单出错')
+          ctx.error(500, '查询用户名表单出错')
           return
         }
       })
@@ -59,41 +60,44 @@ class User {
         return
       }
 
+      // 生成唯一的uuid
       let uuid = uuidV1()
-      let insertId = ''
       const insertData = new UserSchema({
-        id,
-        password,
+        name,
         uuid,
+        lv: 1,
         score: 10,
-        lv: 1
+        password: $passWordUnit.encrypt(password)
       })
 
-      await insertData.save((err, docs) => {
-        if (err) {
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
-          ctx.throw(500, '储存用户名表单出错')
-          return
-        } else {
-          const userFile = file.destination + docs._id
-          const oldFilePath = file.path
-          const newFilePath = userFile + '/logo' + '.' + file.originalname.match(/[^.]+$/)[0]
-          insertId = docs._id
-          if (!(fs.existsSync(userFile))) fs.mkdirSync(userFile)
-          fs.rename(oldFilePath, newFilePath, err => {
-            if (err) {
-              ctx.throw(500, '照片处理失败')
-              return
-            }
-          })
-        }
-      })
+      //储存新数据
+      const insertDocs = await insertData.save()
+
+      // 储存失败
+      if (!insertDocs) {
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+        return ctx.error(500, '储存用户名表单出错')
+      }
+
+      // 将图片放置如对应的文件夹
+      const userFile = file.destination + 'user/' + insertDocs._id
+      const oldFilePath = file.path
+      const newFilePath = userFile + '/logo' + '.' + file.originalname.match(/[^.]+$/)[0]
+      if (!(fs.existsSync(userFile))) fs.mkdirSync(userFile)
+      try {
+        fs.renameSync(oldFilePath, newFilePath)
+      } catch (e) {
+        await UserSchema.remove({name: name}) // 文件没有处理好的情况下 删除注册之前名
+        fs.unlinkSync(filePath)
+        ctx.error(500, '照片处理失败')
+        return
+      }
 
       const resultData = {
-        id: insertId, // 用户序列号
-        name: id,  // 用户名
-        uuid
+        id: insertDocs._id, // 用户序列号
+        name  // 用户名
       }
+
       // req.session.userData = userData
       ctx.body = {
         statue: 1,

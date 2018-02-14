@@ -1,10 +1,24 @@
 const Constant = require('./servers/global.js')
 const Koa = require('Koa')
+const Path = require('path')
 const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
+const koaStatic = require('koa-static')
 const routerIndex = require('./routers/index.js')
+const errorLogs = require('./lib/errorLogs.js')
 const App = new Koa()
 
+// 设定静态文件
+App.use(koaStatic(Path.join(__dirname, 'static')))
+// App.use(koaStatic(Path.join(__dirname + './public')))
+
+// 设置错误日志报告中间件
+App.use(async (ctx, next) => {
+  ctx.error = errorLogs(ctx)
+  await next()
+})
+
+// 使用bodyparse获取post请求数据
 App.use(bodyParser({
   enableTypes: ['json', 'form', 'text']
 }))
