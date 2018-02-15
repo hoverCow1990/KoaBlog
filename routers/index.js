@@ -1,9 +1,12 @@
-const user = require('./front/user.js')
-
+const User = require('./front/user.js')
+const Message = require('./common/Message.js')
 
 const routers = [{
   url: 'user',
-  Api: user
+  Api: User
+}, {
+  url: 'message',
+  Api: Message
 }]
 
 class RouterIndex {

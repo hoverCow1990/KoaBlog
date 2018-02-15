@@ -12,7 +12,21 @@ let Users = new Schema({
     qq: String,
     git: String,
     blog: String,
-    introduce: String
+    introduce: String,
+    talent: String,
+    signTime: String,
+    messageTime: String,
+    logoType: String
   })
+
+// Users.statics = {
+//   findUser (studentId, callback) {
+//     return this
+//       .findOne({ _id : studentId })
+//       .populate('author')
+//       .exec(callback)
+//   }
+// }
+
 
 module.exports = mongoose.model('Users', Users, 'users')
